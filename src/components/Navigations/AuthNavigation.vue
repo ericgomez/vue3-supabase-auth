@@ -1,13 +1,23 @@
 <script>
 import { useRouter } from 'vue-router';
+import { supabase } from "@/utils/supabase";
+import { setNotification } from "@/utils/notification";
 
 export default {
   name: 'AuthNavigation',
   props: ['user'],
   setup() {
-    const router = useRouter();
+    const router = useRouter()
 
-    const logout = async () => {};
+    const logout = async () => {
+      await supabase.auth.signOut()
+      await router.push("/login")
+
+      setNotification({
+        title: "Has cerrado sesión",
+        message: "😢 Hasta la próxima..."
+      })
+    }
 
     return {
       logout,
