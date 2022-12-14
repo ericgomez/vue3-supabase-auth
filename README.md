@@ -9,6 +9,25 @@ Supabase is an open source Firebase alternative providing all the backend featur
 npm install @supabase/supabase-js@1
 ```
 
+
+## Trigger replicate users on profiles
+In the Supabase SQL Editor run `User Management Starter` to create a new database 
+After running `User Management Starter`, run the following new query
+```shell
+create or replace function public.handle_new_user() 
+returns trigger as $$
+begin
+  insert into public.profiles (id, username)
+  values (new.id, new.email);
+  return new;
+end;
+$$ language plpgsql security definer;
+
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+```
+
 ## Install Tailwind CSS
 
 ```sh
