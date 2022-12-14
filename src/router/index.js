@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { setLoading } from '@/utils/loading';
 import { setNotification } from '@/utils/notification';
+import { setLoading } from '@/utils/loading';
+import { store } from '@/utils/store';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -36,6 +37,9 @@ const router = createRouter({
       path: '/todos',
       name: 'Todos',
       component: () => import('../views/TodosView.vue'),
+      meta: {
+        requiresAuth: true, // validate by guards
+      },
     },
   ],
 });
@@ -44,6 +48,18 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   setLoading(true);
   setNotification(null);
+
+  const { user } = store;
+  if (!user) {
+    if (to.meta.requiresAuth) {
+      return next('/login');
+    }
+  } else {
+    if (!to.meta.hasOwnProperty('requiresAuth')) {
+      return next('/profile');
+    }
+  }
+
   next();
 });
 
