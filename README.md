@@ -2,10 +2,11 @@
 
 This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
 
-## Installation of dependencies
+## Installation of dependencies: (Supabase v1)
+Supabase is an open source Firebase alternative providing all the backend features you need to build a product.
 
 ```sh
-npm install @supabase/supabase-js
+npm install @supabase/supabase-js@1
 ```
 
 ## Install Tailwind CSS
