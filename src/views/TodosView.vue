@@ -72,9 +72,49 @@ export default {
       }
     };
 
-    const doneTodo = async (id) => {};
+    const doneTodo = async (id) => {
+      try {
+        setLoading(true);
 
-    const undoneTodo = async (id) => {};
+        const { error } = await supabase
+          .from("todos")
+          .update({
+            is_complete: true,
+          })
+          .match({ id });
+
+        await getTodos();
+      } catch (e) {
+        setNotification({
+          title: "Error actualizando tarea",
+          message: e.message
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const undoneTodo = async (id) => {
+      try {
+        setLoading(true);
+
+        const { error } = await supabase
+            .from("todos")
+            .update({
+              is_complete: false,
+            })
+            .match({ id });
+
+        await getTodos();
+      } catch (e) {
+        setNotification({
+          title: "Error actualizando tarea",
+          message: e.message
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
 
     const removeTodo = async (id) => {};
 
