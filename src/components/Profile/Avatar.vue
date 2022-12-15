@@ -1,5 +1,8 @@
 <script>
 import { ref, toRefs, watch } from 'vue';
+import { supabase } from "@/utils/supabase"
+import { setNotification } from "@/utils/notification"
+import { setLoading } from "@/utils/loading"
 
 export default {
   name: 'Avatar',
@@ -10,16 +13,68 @@ export default {
 
   setup(prop, { emit }) {
     const { path } = toRefs(prop);
-    const src = ref('');
+    const src = ref("");
     const files = ref();
 
-    const downloadImage = async () => {};
+    const downloadImage = async () => {
+      try {
+        // download file by supabase
+        const { data, error } = await supabase
+          .storage
+          .from("avatars")
+          .download(path.value);
 
-    const uploadAvatar = async (evt) => {};
+        if (error) throw error;
+
+        // create a new url
+        src.value = URL.createObjectURL(data);
+      } catch (e) {
+        setNotification({
+          title: "Error descargando imagen",
+          message: e.message
+        });
+      }
+    }
+
+    const uploadAvatar = async (evt) => {
+      try {
+        setLoading(true);
+
+        files.value = evt.target.files;
+        if (!files.value || files.value.length === 0) {
+          throw new Error("Debes seleccionar un avatar para tu perfil");
+        }
+
+        const file = files.value[0]; // get first file
+        const fileExt = file.name.split(".").pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        // upload file by supabase
+        const { error: uploadError } = await supabase
+          .storage
+          .from("avatars")
+          .upload(filePath, file);
+
+        if (uploadError) {
+          throw uploadError;
+        }
+
+        emit("update:path", filePath);
+        emit("upload");
+      } catch (e) {
+        setNotification({
+          title: "Error subiendo el avatar",
+          message: e.message,
+        });
+      } finally {
+        setLoading(false);
+      }
+    }
 
     watch(path, () => {
-      path.value ? downloadImage() : '';
-    });
+      path.value ? downloadImage() : "";
+    })
 
     return {
       path,
