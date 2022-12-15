@@ -22,7 +22,7 @@ export default {
 <template>
   <div>
     <p class="leading-relaxed text-lg mb-4">
-      Más información acerca de ti en tu perfil de Firebase con Vue 3.
+      Más información acerca de ti en tu perfil de Supabase con Vue 3.
     </p>
 
     <TextInput id="username" label="Tu usuario" :value="username" />

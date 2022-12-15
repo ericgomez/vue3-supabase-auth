@@ -52,7 +52,39 @@ export default {
       }
     };
 
-    const updateProfile = async () => {};
+    const updateProfile = async () => {
+      try {
+        setLoading(true);
+
+        const updates = {
+          id: store.user.id,
+          username: store.user.email,
+          avatar_url: avatar_url.value,
+          website: website.value,
+          updated_at: new Date()
+        }
+
+        let { error } = await supabase
+          .from("profiles")
+          .upsert(updates, {
+            returning: "minimal",
+          });
+
+        if (error) throw error;
+
+        setNotification({
+          title: "Perfil actualizado",
+          message: "¡Tu perfil ha sido actualizado!"
+        });
+      } catch (e) {
+        setNotification({
+          title: "Error actualizando perfil",
+          message: e.message
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
 
     const updatePassword = async () => {};
 
