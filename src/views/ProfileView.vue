@@ -86,7 +86,45 @@ export default {
       }
     };
 
-    const updatePassword = async () => {};
+    const updatePassword = async () => {
+      if (password.value.length > 6) {
+        if (password.value !== passwordConfirmation.value) {
+          setNotification({
+            title: "¡Error contraseñas!",
+            message: "Las contraseñas no coinciden"
+          });
+        } else {
+          try {
+            setLoading(true);
+
+            const { error } = await supabase
+              .auth
+              .update({
+                password: password.value,
+              });
+
+            if (error) throw error;
+
+            setNotification({
+              title:" Contraseña actualizada",
+              message: "¡Tu contraseña ha sido actualizada correctamente!"
+            });
+          } catch (e) {
+            setNotification({
+              title: "Error actualizando contraseña",
+              message: e.message,
+            });
+          } finally {
+            setLoading(false);
+          }
+        }
+      } else {
+        setNotification({
+          title: "Error contraseña",
+          message: "La contraseña debe tener una longitud mínima de 6 caracteres"
+        });
+      }
+    };
 
     onMounted(async () => {
       await getProfile();
