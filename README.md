@@ -28,6 +28,9 @@ create trigger on_auth_user_created
   for each row execute procedure public.handle_new_user();
 ```
 
+## Create database Todos in Supabase
+In the Supabase SQL Editor run `Todo List` to create a new database
+
 ## Install Tailwind CSS
 
 ```sh
