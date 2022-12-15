@@ -4,6 +4,10 @@ import Avatar from '@/components/Profile/Avatar.vue';
 import TextInput from '@/components/Forms/TextInput.vue';
 import SubmitButton from '@/components/Forms/SubmitButton.vue';
 import ProfileForm from '@/components/Profile/ProfileForm.vue';
+import { supabase } from "@/utils/supabase";
+import { store } from "@/utils/store";
+import { setLoading } from "@/utils/loading";
+import { setNotification } from "@/utils/notification";
 
 export default {
   name: 'ProfileView',
@@ -20,7 +24,33 @@ export default {
     const password = ref('');
     const passwordConfirmation = ref('');
 
-    const getProfile = async () => {};
+    const getProfile = async () => {
+      try {
+        setLoading(true);
+
+        let { data, error, status } = await supabase
+          .from("profiles")
+          .select(`username, website, avatar_url`)
+          .eq("id", store.user.id)
+          .single();
+
+        if (error && status !== 406) throw error;
+
+        if (data) {
+          username.value = data.username;
+          website.value = data.website;
+          avatar_url.value = data.avatar_url;
+        }
+
+      } catch (e) {
+        setNotification({
+          title: "Error obteniendo perfil",
+          message: e.message,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
 
     const updateProfile = async () => {};
 
