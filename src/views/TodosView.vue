@@ -1,7 +1,12 @@
 <script>
-import { onMounted, reactive, ref, toRefs } from 'vue';
+import { onMounted, ref, toRefs } from 'vue';
 import TodoForm from '@/components/Todos/TodoForm.vue';
 import TodoItem from '@/components/Todos/TodoItem.vue';
+import { store } from '@/utils/store';
+import { supabase } from '@/utils/supabase';
+import { setLoading } from '@/utils/loading';
+import { setNotification } from '@/utils/notification';
+
 export default {
   name: 'Todos',
   components: {
@@ -10,11 +15,34 @@ export default {
   },
   setup() {
     const todo = ref('');
-    const todoData = reactive({
-      todos: [],
-    });
+    const todos = ref([]);
 
-    const getTodos = async () => {};
+    const getTodos = async () => {
+      try {
+        setLoading(true);
+
+        const { data, error } = await supabase
+          .from("todos")
+          .select(`id, task, is_complete, inserted_at`);
+
+        if (error) throw error;
+
+        todos.value = [];
+
+        if (data.length) {
+          data.forEach(todo => {
+            todos.value.push(todo);
+          });
+        }
+      } catch (e) {
+        setNotification({
+          title: "Error obteniendo tareas",
+          message: e.message
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
 
     const addTodo = async (e) => {
       e.preventDefault();
@@ -32,7 +60,7 @@ export default {
 
     return {
       todo,
-      ...toRefs(todoData),
+      todos,
       addTodo,
       doneTodo,
       undoneTodo,
