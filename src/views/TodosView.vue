@@ -116,7 +116,27 @@ export default {
       }
     };
 
-    const removeTodo = async (id) => {};
+    const removeTodo = async (id) => {
+      try {
+        setLoading(true);
+
+        const { error } = await supabase
+          .from("todos")
+          .delete()
+          .match({ id });
+
+        if (error) throw error;
+
+        await getTodos();
+      } catch (e) {
+        setNotification({
+          title: "Error eliminando tarea",
+          message: e.message
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
 
     onMounted(() => {
       getTodos();
