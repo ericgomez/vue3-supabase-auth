@@ -46,6 +46,30 @@ export default {
 
     const addTodo = async (e) => {
       e.preventDefault();
+      try {
+        setLoading(true);
+
+        const { error } = await supabase
+          .from("todos")
+          .insert({
+            user_id: store.user.id,
+            task: todo.value,
+            inserted_at: new Date(),
+          });
+
+        if (error) throw error;
+
+        todo.value = "";
+
+        await getTodos();
+      } catch (e) {
+        setNotification({
+          title: "Error creando tarea",
+          message: e.message
+        });
+      } finally {
+        setLoading(false);
+      }
     };
 
     const doneTodo = async (id) => {};
